@@ -1,9 +1,5 @@
 const mongoose = require('mongoose');
 
-/**
- * Listing Schema - Mongoose Model for items being sold
- * Demonstrates OOP: Schema definition, methods, virtuals
- */
 const listingSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -36,14 +32,14 @@ const listingSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide hostel information']
   },
- images: {
-  type: [String],
-  required: true
-},
-image: {
-  type: String,
-  default: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80'
-},
+  images: {
+    type: [String],
+    required: true
+  },
+  image: {
+    type: String,
+    default: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80'
+  },
   interested: {
     type: Number,
     default: 0,
@@ -76,6 +72,9 @@ image: {
   buyerHostel: {
     type: String
   },
+  buyerEmail: {
+    type: String
+  },
   requestedAt: {
     type: Date
   },
@@ -88,22 +87,12 @@ image: {
   toObject: { virtuals: true }
 });
 
-/**
- * Instance Method: Show interest in listing
- */
 listingSchema.methods.showInterest = async function() {
   this.interested += 1;
   await this.save();
   return this.interested;
 };
 
-/**
- * Instance Method: Request to buy (pending state)
- * @param {ObjectId} buyerId - ID of the buyer
- * @param {String} buyerName - Name of buyer
- * @param {String} buyerContact - Contact of buyer
- * @param {String} buyerHostel - Hostel of buyer
- */
 listingSchema.methods.requestToBuy = async function(buyerId, buyerName, buyerContact, buyerHostel) {
   this.status = 'pending';
   this.buyer = buyerId;
@@ -115,9 +104,6 @@ listingSchema.methods.requestToBuy = async function(buyerId, buyerName, buyerCon
   return this;
 };
 
-/**
- * Instance Method: Seller confirms sale
- */
 listingSchema.methods.confirmSale = async function() {
   if (this.status !== 'pending') {
     throw new Error('Can only confirm pending requests');
@@ -128,9 +114,6 @@ listingSchema.methods.confirmSale = async function() {
   return this;
 };
 
-/**
- * Instance Method: Seller rejects sale
- */
 listingSchema.methods.rejectSale = async function() {
   if (this.status !== 'pending') {
     throw new Error('Can only reject pending requests');
@@ -140,32 +123,24 @@ listingSchema.methods.rejectSale = async function() {
   this.buyerName = null;
   this.buyerContact = null;
   this.buyerHostel = null;
+  this.buyerEmail = null;
   this.requestedAt = null;
   await this.save();
   return this;
 };
 
-/**
- * Static Method: Get available listings (not pending or sold)
- */
 listingSchema.statics.getAvailable = function() {
   return this.find({ status: 'available' })
     .populate('seller', 'name contact hostel')
     .sort('-createdAt');
 };
 
-/**
- * Static Method: Get pending requests for a seller
- */
 listingSchema.statics.getPendingForSeller = function(sellerId) {
   return this.find({ seller: sellerId, status: 'pending' })
-    .populate('buyer', 'name contact hostel')
+    .populate('buyer', 'name contact hostel email')
     .sort('-requestedAt');
 };
 
-/**
- * Static Method: Get statistics
- */
 listingSchema.statics.getStats = async function() {
   const total = await this.countDocuments();
   const available = await this.countDocuments({ status: 'available' });
@@ -184,19 +159,6 @@ listingSchema.statics.getStats = async function() {
   };
 };
 
-/**
- * Pre-save middleware
- */
-listingSchema.pre('save', function(next) {
-  if (this.status === 'sold' && !this.buyer) {
-    next(new Error('Sold items must have a buyer'));
-  }
-  next();
-});
-
-/**
- * Virtual: Time since posted
- */
 listingSchema.virtual('timeAgo').get(function() {
   const now = new Date();
   const diff = now - this.createdAt;

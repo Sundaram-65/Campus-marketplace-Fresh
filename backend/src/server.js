@@ -7,27 +7,28 @@ const path = require('path');
 const database = require('./config/database');
 
 // Import routes
+const authRoutes = require('./routes/authRoutes');
 const listingRoutes = require('./routes/listingRoutes');
 const userRoutes = require('./routes/userRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+
+// Import middleware
+const authenticateToken = require('./middleware/authenticateToken');
 
 /**
- * Main Server Application with MongoDB
- * Demonstrates OOP architecture in Node.js/Express with Mongoose
+ * Main Server Application with MongoDB & JWT
  */
 class MarketplaceServer {
   constructor() {
     this.app = express();
     this.port = process.env.PORT || 5000;
-    // Setup middleware and routes
+    
     this.setupMiddleware();
     this.setupRoutes();
     this.setupErrorHandling();
   }
 
-  /**
-   * Setup Express middleware
-   */
   setupMiddleware() {
     // CORS
     this.app.use(cors({
@@ -36,6 +37,8 @@ class MarketplaceServer {
     }));
 
     // Body parser
+    this.app.use('/api/transactions', transactionRoutes);
+
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 
@@ -49,18 +52,15 @@ class MarketplaceServer {
     });
   }
 
-  /**
-   * Setup API routes
-   */
   setupRoutes() {
     // Health check
     this.app.get('/', (req, res) => {
       res.json({
-        message: 'Campus Marketplace API with MongoDB',
-        version: '2.0.0',
+        message: 'Campus Marketplace API with MongoDB & JWT',
+        version: '3.0.0',
         status: 'running',
-        database: database.getStatus(),
         endpoints: {
+          auth: '/api/auth',
           listings: '/api/listings',
           users: '/api/users',
           upload: '/api/upload'
@@ -68,10 +68,15 @@ class MarketplaceServer {
       });
     });
 
-    // API routes
-    this.app.use('/api/listings', listingRoutes);
-    this.app.use('/api/users', userRoutes);
-    this.app.use('/api/upload', uploadRoutes);  // ✅ Upload route registered
+    // Auth routes (NO JWT required)
+    this.app.use('/api/auth', authRoutes);
+
+    // Upload route (NO JWT required for now, but can add)
+    this.app.use('/api/upload', uploadRoutes);
+
+    // Protected routes (JWT required)
+    this.app.use('/api/listings', authenticateToken, listingRoutes);
+    this.app.use('/api/users', authenticateToken, userRoutes);
 
     // 404 handler
     this.app.use((req, res) => {
@@ -82,9 +87,6 @@ class MarketplaceServer {
     });
   }
 
-  /**
-   * Setup error handling
-   */
   setupErrorHandling() {
     this.app.use((err, req, res, next) => {
       console.error('❌ Error:', err.stack);
@@ -96,23 +98,18 @@ class MarketplaceServer {
     });
   }
 
-  /**
-   * Start the server
-   */
   async start() {
     try {
-      // Connect to database first
       await database.connect();
-
-      // Start Express server
+      
       this.app.listen(this.port, () => {
         console.log('═══════════════════════════════════════════════════');
-        console.log('  Campus Marketplace Backend Server (MongoDB)');
+        console.log('  Campus Marketplace Backend (MongoDB & JWT)');
         console.log('═══════════════════════════════════════════════════');
         console.log(`  🚀 Server running on port ${this.port}`);
         console.log(`  🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
         console.log(`  📡 API URL: http://localhost:${this.port}`);
-        console.log(`  🗄️  Database: ${database.getStatus()}`);
+        console.log(`  🗂️  Uploads public at http://localhost:${this.port}/uploads/`);
         console.log('═══════════════════════════════════════════════════');
       });
     } catch (error) {
@@ -122,7 +119,6 @@ class MarketplaceServer {
   }
 }
 
-// Create and start server
 const server = new MarketplaceServer();
 server.start();
 

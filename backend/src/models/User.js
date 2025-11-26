@@ -1,9 +1,5 @@
 const mongoose = require('mongoose');
 
-/**
- * User Schema - Mongoose Model for campus users
- * Demonstrates OOP: Schema definition, methods, virtuals
- */
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -11,12 +7,24 @@ const userSchema = new mongoose.Schema({
     trim: true,
     maxlength: [50, 'Name cannot exceed 50 characters']
   },
+  email: {
+    type: String,
+    required: [true, 'Please provide email'],
+    unique: true,
+    lowercase: true,
+    match: [/^\S+@\S+\.\S+$/, 'Please provide valid email']
+  },
+  password: {
+    type: String,
+    required: [true, 'Please provide password'],
+    minlength: [6, 'Password must be at least 6 characters'],
+    select: false // Don't return password by default
+  },
   rollNo: {
     type: String,
     trim: true,
     uppercase: true,
     unique: true
-    // required: [true, 'Please provide roll number']   // <--- REMOVED required!
   },
   contact: {
     type: String,
@@ -27,12 +35,6 @@ const userSchema = new mongoose.Schema({
   hostel: {
     type: String,
     required: [true, 'Please provide hostel information']
-  },
-  email: {
-    type: String,
-    lowercase: true,
-    trim: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please provide valid email']
   }
 }, {
   timestamps: true,
@@ -40,19 +42,18 @@ const userSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Virtuals for items sold and bought
 userSchema.virtual('itemsSold', {
   ref: 'Listing',
   localField: '_id',
   foreignField: 'seller'
 });
+
 userSchema.virtual('itemsBought', {
   ref: 'Listing',
   localField: '_id',
   foreignField: 'buyer'
 });
 
-// Transaction history
 userSchema.methods.getTransactionHistory = async function() {
   await this.populate('itemsSold');
   await this.populate('itemsBought');
@@ -68,17 +69,12 @@ userSchema.methods.getTransactionHistory = async function() {
   };
 };
 
-/**
- * Static Method: Find or create user (does NOT require rollNo for buyers)
- */
 userSchema.statics.findOrCreate = async function(userData) {
   try {
     let query = {};
-    if (userData.rollNo) {
-      query.rollNo = userData.rollNo;
-    } else if (userData.contact) {
-      query.contact = userData.contact;
-    }
+    if (userData.rollNo) query.rollNo = userData.rollNo;
+    else if (userData.contact) query.contact = userData.contact;
+
     let user = await this.findOne(query);
 
     if (!user) {
@@ -95,7 +91,6 @@ userSchema.statics.findOrCreate = async function(userData) {
         }
       }
     } else {
-      // Update non-null values
       if (userData.name) user.name = userData.name;
       if (userData.hostel) user.hostel = userData.hostel;
       if (userData.email) user.email = userData.email;
@@ -110,9 +105,5 @@ userSchema.statics.findOrCreate = async function(userData) {
     throw error;
   }
 };
-
-userSchema.pre('save', function(next) {
-  next();
-});
 
 module.exports = mongoose.model('User', userSchema);
