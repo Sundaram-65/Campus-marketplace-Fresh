@@ -16,6 +16,12 @@ const transactionRoutes = require('./routes/transactionRoutes');
 // Import middleware
 const authenticateToken = require('./middleware/authenticateToken');
 
+const allowed = [
+  "https://campusmarketplace-iiitu.netlify.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
 /**
  * Main Server Application with MongoDB & JWT
  */
@@ -31,11 +37,16 @@ class MarketplaceServer {
 
   setupMiddleware() {
     // CORS
-    this.app.use(cors({
-      origin: ['http://localhost:3000', 'http://localhost:3001','https://campusmarketplace-iiitu.netlify.app/'],
-      credentials: true
+        app.use(cors({
+          origin(origin, cb) {
+            if (!origin) return cb(null, true);
+            if (allowed.includes(origin)) return cb(null, true);
+            cb(new Error("Not allowed by CORS"));
+          },
+          credentials: true,
     }));
 
+    app.options("*", cors());
     // Body parser
     this.app.use('/api/transactions', transactionRoutes);
 
