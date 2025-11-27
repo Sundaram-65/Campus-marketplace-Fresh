@@ -32,7 +32,7 @@ class MarketplaceServer {
   setupMiddleware() {
     // CORS
     this.app.use(cors({
-      origin: ['http://localhost:3000', 'http://localhost:3001','https://campusmarketplace-iiitu.netlify.app/'],
+      origin: ['https://campusmarketplace-iiitu.netlify.app'],
       credentials: true
     }));
 
