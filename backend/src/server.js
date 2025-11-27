@@ -37,7 +37,7 @@ class MarketplaceServer {
 
   setupMiddleware() {
     // CORS
-        app.use(cors({
+        this.app.use(cors({
           origin(origin, cb) {
             if (!origin) return cb(null, true);
             if (allowed.includes(origin)) return cb(null, true);
@@ -46,7 +46,7 @@ class MarketplaceServer {
           credentials: true,
     }));
 
-    app.options("*", cors());
+    this.app.options("*", cors());
     // Body parser
     this.app.use('/api/transactions', transactionRoutes);
 
