@@ -62,19 +62,19 @@ async function fetchHistory() {
       await api.post('/listings', listingData);
       setTab('browse');
       fetchListings();
-      alert('✅ Listing created successfully!');
+      alert(' Listing created successfully!');
     } catch (error) {
-      alert('❌ ' + (error.response?.data?.message || 'Failed to create listing'));
+      alert('' + (error.response?.data?.message || 'Failed to create listing'));
     }
   }
 
   async function handleInterest(listingId) {
     try {
       await api.post(`/listings/${listingId}/interest`);
-      alert('✅ Interest recorded!');
+      alert(' Interest recorded!');
       fetchListings();
     } catch (error) {
-      alert('❌ Failed to record interest');
+      alert(' Failed to record interest');
     }
   }
 
@@ -86,10 +86,10 @@ async function fetchHistory() {
       contact: user.contact,      // Use logged-in user's contact
       hostel: user.hostel         // Use logged-in user's hostel
     });
-    alert('✅ Purchase request sent! Waiting for seller confirmation.');
+    alert(' Purchase request sent! Waiting for seller confirmation.');
     fetchListings();
   } catch (error) {
-    alert('❌ ' + (error.response?.data?.message || 'Failed to send request'));
+    alert(' ' + (error.response?.data?.message || 'Failed to send request'));
   }
 }
 

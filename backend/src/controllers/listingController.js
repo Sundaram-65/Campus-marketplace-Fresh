@@ -123,7 +123,7 @@ class ListingController {
         data: listing
       });
     } catch (error) {
-      console.error('❌ Error creating listing:', error);
+      console.error(' Error creating listing:', error);
       res.status(400).json({
         success: false,
         message: error.message || 'Error creating listing'
@@ -271,16 +271,16 @@ class ListingController {
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: listing.buyer.email || 'buyer@example.com',
-        subject: `✅ Purchase Confirmed for "${listing.title}"`,
+        subject: ` Purchase Confirmed for "${listing.title}"`,
         html: `
           <div style="font-family: Arial, sans-serif; color: #333;">
-            <h2 style="color: #28a745;">🎉 Purchase Confirmed!</h2>
+            <h2 style="color: #28a745;"> Purchase Confirmed!</h2>
             <p>Your purchase request for <strong>${listing.title}</strong> has been accepted by the seller.</p>
             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p><strong>📌 Item:</strong> ${listing.title}</p>
-              <p><strong>💰 Amount:</strong> ₹${listing.price}</p>
-              <p><strong>👤 Seller:</strong> ${listing.sellerName}</p>
-              <p><strong>📞 Contact:</strong> ${listing.contact}</p>
+              <p><strong> Item:</strong> ${listing.title}</p>
+              <p><strong> Amount:</strong> ₹${listing.price}</p>
+              <p><strong> Seller:</strong> ${listing.sellerName}</p>
+              <p><strong> Contact:</strong> ${listing.contact}</p>
             </div>
             <p>Contact the seller to finalize the transaction.</p>
             <p style="color: #999; font-size: 12px;">© 2025 Campus Marketplace</p>
@@ -288,12 +288,12 @@ class ListingController {
         `
       });
     } catch (emailError) {
-      console.error('⚠️ Confirmation email failed:', emailError);
+      console.error(' Confirmation email failed:', emailError);
     }
 
     res.json({
       success: true,
-      message: '✅ Sale confirmed successfully!',
+      message: ' Sale confirmed successfully!',
       data: listing
     });
   } catch (error) {
@@ -317,7 +317,6 @@ class ListingController {
       });
     }
 
-    // ✅ FIX: Verify listing is in pending state
     if (listing.status !== 'pending') {
       return res.status(400).json({
         success: false,
@@ -325,8 +324,7 @@ class ListingController {
       });
     }
 
-    // ✅ FIX: Revert to 'available' when seller rejects
-    await listing.rejectSale();
+     await listing.rejectSale();
 
     // Send rejection email to buyer
     try {
@@ -344,7 +342,7 @@ class ListingController {
         `
       });
     } catch (emailError) {
-      console.error('⚠️ Rejection email failed:', emailError);
+      console.error(' Rejection email failed:', emailError);
     }
 
     res.json({

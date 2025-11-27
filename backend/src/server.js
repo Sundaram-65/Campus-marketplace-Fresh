@@ -32,7 +32,7 @@ class MarketplaceServer {
   setupMiddleware() {
     // CORS
     this.app.use(cors({
-      origin: ['http://localhost:3000', 'http://localhost:3001'],
+      origin: ['http://localhost:3000', 'http://localhost:3001','https://campusmarketplace-iiitu.netlify.app/'],
       credentials: true
     }));
 
@@ -89,7 +89,7 @@ class MarketplaceServer {
 
   setupErrorHandling() {
     this.app.use((err, req, res, next) => {
-      console.error('❌ Error:', err.stack);
+      console.error(' Error:', err.stack);
       res.status(500).json({
         success: false,
         message: 'Internal server error',
@@ -102,18 +102,18 @@ class MarketplaceServer {
     try {
       await database.connect();
       
-      this.app.listen(this.port, () => {
+      this.app.listen(this.port,"0.0.0.0" , () => {
         console.log('═══════════════════════════════════════════════════');
         console.log('  Campus Marketplace Backend (MongoDB & JWT)');
         console.log('═══════════════════════════════════════════════════');
-        console.log(`  🚀 Server running on port ${this.port}`);
-        console.log(`  🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`  📡 API URL: http://localhost:${this.port}`);
-        console.log(`  🗂️  Uploads public at http://localhost:${this.port}/uploads/`);
+        console.log(`  Server running on port ${this.port}`);
+        console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`  API URL: http://localhost:${this.port}`);
+        console.log(`  Uploads public at http://localhost:${this.port}/uploads/`);
         console.log('═══════════════════════════════════════════════════');
       });
     } catch (error) {
-      console.error('❌ Failed to start server:', error);
+      console.error(' Failed to start server:', error);
       process.exit(1);
     }
   }

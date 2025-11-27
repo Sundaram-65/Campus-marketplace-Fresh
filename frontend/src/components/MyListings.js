@@ -5,20 +5,20 @@ export default function MyListings({ listings, onRefresh, user }) {
   async function handleAccept(listingId) {
     try {
       await api.post(`/listings/${listingId}/confirm`);
-      alert('✅ Sale confirmed! Item marked as sold.');
+      alert('Sale confirmed! Item marked as sold.');
       onRefresh();
     } catch (error) {
-      alert('❌ ' + (error.response?.data?.message || 'Failed to confirm'));
+      alert(' ' + (error.response?.data?.message || 'Failed to confirm'));
     }
   }
 
   async function handleReject(listingId) {
     try {
       await api.post(`/listings/${listingId}/reject`);
-      alert('✅ Request rejected. Item is now available again.');
+      alert(' Request rejected. Item is now available again.');
       onRefresh();
     } catch (error) {
-      alert('❌ ' + (error.response?.data?.message || 'Failed to reject'));
+      alert(' ' + (error.response?.data?.message || 'Failed to reject'));
     }
   }
   return (
@@ -72,13 +72,13 @@ export default function MyListings({ listings, onRefresh, user }) {
                   onClick={() => handleAccept(listing._id)}
                   className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 rounded-lg transition transform hover:scale-105 shadow-md"
                 >
-                  ✅ Accept & Confirm Sale
+                   Accept & Confirm Sale
                 </button>
                 <button
                   onClick={() => handleReject(listing._id)}
                   className="flex-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold py-3 rounded-lg transition transform hover:scale-105 shadow-md"
                 >
-                  ❌ Reject Request
+                   Reject Request
                 </button>
               </div>
             </div>

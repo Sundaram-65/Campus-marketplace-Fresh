@@ -53,7 +53,7 @@ class AuthController {
         }
       });
     } catch (error) {
-      console.error('❌ Signup error:', error);
+      console.error(' Signup error:', error);
       res.status(500).json({
         success: false,
         message: error.message || 'Signup failed'
@@ -117,7 +117,7 @@ class AuthController {
         }
       });
     } catch (error) {
-      console.error('❌ Login error:', error);
+      console.error(' Login error:', error);
       res.status(500).json({
         success: false,
         message: error.message || 'Login failed'

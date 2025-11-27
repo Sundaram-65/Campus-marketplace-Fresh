@@ -22,17 +22,17 @@ class Database {
 
       this.connection = await mongoose.connect(process.env.MONGODB_URI, options);
       
-      console.log('✅ MongoDB Connected Successfully');
+      console.log(' MongoDB Connected Successfully');
       console.log(`   Database: ${this.connection.connection.name}`);
       console.log(`   Host: ${this.connection.connection.host}`);
       
       // Handle connection events
       mongoose.connection.on('error', (err) => {
-        console.error('❌ MongoDB connection error:', err);
+        console.error(' MongoDB connection error:', err);
       });
 
       mongoose.connection.on('disconnected', () => {
-        console.log('⚠️  MongoDB disconnected');
+        console.log('  MongoDB disconnected');
       });
 
       // Graceful shutdown
@@ -42,7 +42,7 @@ class Database {
       });
 
     } catch (error) {
-      console.error('❌ MongoDB connection failed:', error.message);
+      console.error(' MongoDB connection failed:', error.message);
       process.exit(1);
     }
   }
